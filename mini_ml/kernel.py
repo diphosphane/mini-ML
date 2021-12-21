@@ -14,18 +14,25 @@ from dataclasses import dataclass
 from typing import Dict
 
 class Kernel():
+    Linear = 'Linear'
     Gaussian = 'Gaussian'
     RBF = 'RBF'
     Exponential = 'Exponential'
     Matern = 'Matern'
     RationalQuadratic = 'RationalQuadratic'
 
+class TestKernel():
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        pass
+
+def Linear(x1, x2, params: Dict[str, float]={}):
+    return x1 @ x2.T
 
 def Gaussian(x1, x2, params: Dict[str, float]):
     dist = np.sum(x1**2, 1).reshape(-1, 1) \
             + np.sum(x2**2, 1) \
             - 2*np.dot(x1, x2.T)
-    return np.exp(-0.5 * dist / (self.params['sigma']**2))
+    return np.exp(-0.5 * dist / (params['sigma']**2))
 
 def RBF(x1, x2, params: Dict[str, float]):
     dist_matrix = np.sum(x1**2, 1).reshape(-1, 1) + np.sum(x2**2, 1) - 2 * np.dot(x1, x2.T)
