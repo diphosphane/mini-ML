@@ -12,28 +12,21 @@ import numpy as np
 from typing import Dict
 from base import BaseEstimator
 from kernel import Kernel as K
+from kernel import BaseKernel
 
 
 class KRR(BaseEstimator):
-    def __init__(self, kernel=K.Linear, lambda_=0.1, **kw):
-        self.kernel = getattr(self, kernel)
+    def __init__(self, kernel: BaseKernel=K.Linear, lambda_=0.1, **kw):
         self.params = {'lambda': lambda_, 'sigma': 0.01}
         self.set_kw(kw)
+        self.kernel = kernel; self.kernel.set_params(self.params)
         self.train_x = None
         self.alpha = None
     
     def set_kw(self, kw: Dict[str, Any]):
+        self.kernel.set_params(kw)
         for k, v in kw.items():
             self.params[k] = v
-    
-    def Linear(self, x1, x2):
-        return x1 @ x2.T
-    
-    def Gaussian(self, x1, x2):
-        dist = np.sum(x1**2, 1).reshape(-1, 1) \
-               + np.sum(x2**2, 1) \
-               - 2*np.dot(x1, x2.T)
-        return np.exp(-0.5 * dist / (self.params['sigma']**2))
     
     def fit(self, X, y):
         self.train_x = np.asarray(X)
